@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<title>content - cnNodeJs.Org data & vue By FungLeo</title>
+	<meta name="keywords" content="cnNodeJs,vue,FungLeo">
+	<meta name="description" content="本页面是获取cnNodeJs公开API数据，通过vuejs进行渲染的DOME页面。用来展示FungLeo的前端技能。">
+	<link rel="stylesheet" href="res/css/style.css">
+</head>
+<body>
+	<!--#include virtual="inc/header.html"-->
+	<header class="header">
+	<h1 class="logo">
+		<a href="index.html" title="cnNodeJs.Org Home By FungLeo">cnNodeJs.Org Home By FungLeo</a>
+	</h1>
+	<nav class="nav">
+		<ul>
+			<li><a href="index.html" class="on">首页</a></li>
+			<li><a href="#" target="_blank">分类标签</a></li>
+			<li><a href="#" title="我开发的CMS系统" target="_blank">栏目阅读</a></li>
+			<li><a href="http://cnodejs.org/" target="_blank">cnodejs官方</a></li>
+			<li><a href="#">我的简介</a></li>
+		</ul>
+	</nav>
+</header>
+<!--end header-->
+	<section class="home">
+		<article class="article">
+			<h1 class="title">{{ data.title }}</h1>
+			<div class="date">
+				作者：<a v-bind:href="data.author.avatar_url" target="_blank" v-text="data.author.loginname"></a>
+				日期：{{ data.create_at | time }}
+			</div>
+			<div class="article_content" v-html="data.content"></div>
+			<h3 class="replies_title">留言评论</h3>
+			<ul class="list">
+				<li v-for="info in data.replies">
+					<i class="user_ico">
+						<img v-bind:src="info.author.avatar_url" v-bind:alt="info.author.loginname">
+						<span v-text="info.author.loginname"></span>
+					</i>
+					<time class="time" >{{info.create_at | time}}</time>
+					<div class="talk" v-html="info.content"></div>
+				</li>
+			</ul>
+		</article>
+		<!--#include virtual="inc/bar.html"-->
+		<aside class="bar">
+	<h3>本页说明</h3>
+	<ol>
+		<li>时间仓促,没有认真的设计页面.</li>
+		<li>页面主体UI表现采用<code>CSS3</code>构造.</li>
+		<li>前端路由采用<code>location</code>和<code>history</code>等对象实现.</li>
+		<li><code>Ajax</code>请求使用了NPM的<code>Axios</code>client.</li>
+        <li>内容数据来源于 Cnodejs.org .</li>
+        <li>页面渲染使用了<code>Vue.js 2</code>.</li>
+		<li>分页处理使用了<code>laypage</code>插件.</li>
+	</ol>
+	<h3>使用工具</h3>
+	<ol>
+		<li>编辑器使用<code>Sublime Text 3</code></li>
+		<li><code>css</code>使用<code>scss</code>预编译技术</li>
+		<li><code>scss</code>编译软件使用<code>koala</code></li>
+		<li>操作系统使用<code>windows 10</code>和<code>Ubuntu</code></li>
+		<li>版本控制使用了<code>GIT</code>版本管理软件</li>
+	</ol>
+	<h3>下载代码</h3>
+	<ol>
+		<li>代码托管于<a href="#" >GitHub</a></li>
+	</ol>
+</aside>
+	</section>
+	<input type="hidden" id="refreshed" value="no">
+	<!--#include virtual="inc/footer.html"-->
+	<footer class="copy">
+	2016-2017 版权说明 内容数据来自于 <a href="http://cnodejs.org/">cnodejs.org</a><br>
+	Vue2.0 & 数据Api个人练习页面，欢迎提出意见指教！
+</footer>
+<div class="go_top"></div>
+</body>
+</html>
+<!--脚本开始-->
+<script src="res/js/jquery/jquery-2.2.3.min.js"></script>
+<script src="vue.js"></script>
+<script src="axios.min.js"></script>
+<script src="res/js/common/common.js"></script>
+<script>
+    var scru = function (){
+		var id = getUrlId();
+        var url = "http://cnodejs.org/api/v1/topic/"+id;
+        axios.get(url)
+            .then(function (response) {
+                console.log(response.data);
+                pushtodom(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+    }
+    scru();
+function pushtodom(data){
+	/*
+		使用vue自定义过滤器把接口中传过来的时间进行整形
+	*/
+	Vue.filter('time', function (value) {
+		return goodTime(value);
+	})
+	console.log(data.data);
+	var vm = new Vue({
+		el: '.article',
+		data: data
+	});
+}
+    onload=function(){
+        var e=document.getElementById("refreshed");
+        if(e.value=="no")e.value="yes";
+        else{e.value="no";location.reload();}
+    }
+
+</script>

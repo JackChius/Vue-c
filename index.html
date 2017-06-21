@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="res/css/style.css">
+</head>
+<body>
+<!--Header start-->
+<header class="header">
+    <h1 class="logo">
+        <a href="index.html" title="cNodeJs">cNodeJs site By dunye </a>
+    </h1>
+    <nav class="nav">
+        <ul>
+            <li><a href="index.html" class="on">首页</a></li>
+            <li><a href="#" target="_blank">分类标签</a></li>
+            <li><a href="#" title="pro2" target="_blank">栏目阅读</a></li>
+            <li><a href="http://cnodejs.org/" target="_blank">cnodejs官方</a></li>
+            <li><a href="#">我的简介</a></li>
+        </ul>
+    </nav>
+</header>
+<!--Header end-->
+    <section class="home">
+        <section class="main">
+            <ul class="list">
+                <li v-for="info in data">
+                    <i class="user_ico">
+                        <img v-bind:src="info.author.avatar_url" v-bind:alt="info.author.loginname">
+                        <span v-text="info.author.loginname"></span>
+                    </i>
+                    <time class="time"  >{{info.create_at | time}}</time>
+                    <a class="talk" v-bind:href="'content.html?'+info.id">{{ info.title }}</a>
+                </li>
+            </ul>
+            <div class="page"></div>
+        </section>
+        <!--侧边栏部分。IDE中默认折叠-->
+ 	<aside class="bar">
+	<h3>本页说明</h3>
+	<ol>
+		<li>时间仓促,没有认真的设计页面.</li>
+		<li>页面主体UI表现采用<code>CSS3</code>构造.</li>
+		<li>前端路由采用<code>location</code>和<code>history</code>等对象实现.</li>
+		<li><code>Ajax</code>请求使用了NPM的<code>Axios</code>client.</li>
+        <li>内容数据来源于 Cnodejs.org .</li>
+        <li>页面渲染使用了<code>Vue.js 2</code>.</li>
+		<li>分页处理使用了<code>laypage</code>插件.</li>
+	</ol>
+	<h3>使用工具</h3>
+	<ol>
+		<li>编辑器使用<code>Sublime Text 3</code></li>
+		<li><code>css</code>使用<code>scss</code>预编译技术</li>
+		<li><code>scss</code>编译软件使用<code>koala</code></li>
+		<li>操作系统使用<code>windows 10</code>和<code>Ubuntu</code></li>
+		<li>版本控制使用了<code>GIT</code>版本管理软件</li>
+	</ol>
+	<h3>下载代码</h3>
+	<ol>
+		<li>代码托管于<a href="#" >GitHub</a></li>
+        
+	</ol>
+</aside>
+    </section>
+    </section>
+    <footer class="copy">
+      2016-2017 版权说明 内容数据来自于 <a href="http://cnodejs.org/">cnodejs.org</a><br>
+	Vue2.0 & 数据Api个人练习页面，欢迎提出意见指教！
+    </footer>
+    <div class="go_top"></div>
+<!--脚本开始-->
+<script src="res/js/jquery/jquery-2.2.3.min.js"></script>
+<script src="vue.js"></script>
+<script src="axios.min.js"></script>
+<script src="res/js/common/common.js"></script>
+<script src="res/js/plugins/laypage/laypage.js"></script>
+<script>
+// Vue.prototype.$ajax = axios   
+var scru = function (){
+    var id = getUrlId();
+	var url = "http://cnodejs.org/api/v1/topics?page="+id;
+	axios.get(url)
+      .then(function (response) {
+          console.log(response.data);
+          pushtodom(response.data)
+  })
+      .catch(function (error) {
+          console.log(error);
+  });
+    laypage({
+        cont: $(".page"),
+        pages: 20,
+        curr: id,
+        jump: function(e, first){ //触发分页后的回调
+            if(!first){ //一定要加此判断，否则初始时会无限刷新
+                location.href = '?'+e.curr;
+            }
+        }
+    });
+
+}
+scru();
+function pushtodom(data){
+    Vue.filter('time', function (value) {
+        return goodTime(value);
+    })
+    var vm = new Vue({
+		el: '.list',
+		data: data
+	});
+}
+</script>
+</body>
+</html>
